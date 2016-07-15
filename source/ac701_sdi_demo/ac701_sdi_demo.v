@@ -1,69 +1,3 @@
-// (c) Copyright 2011 - 2013 Xilinx, Inc. All rights reserved.
-//
-// This file contains confidential and proprietary information
-// of Xilinx, Inc. and is protected under U.S. and
-// international copyright and other intellectual property
-// laws.
-//------------------------------------------------------------------------------
-//   ____  ____
-//  /   /\/   /
-// /___/  \  /    Vendor: Xilinx
-// \   \   \/     Version: $Revision: #1 $
-//  \   \         
-//  /   /         Filename: $File: //Groups/video_ip/demos/A7/xapp1097_a7_sdi_demos/Verilog/ac701_sdi_demo/ac701_sdi_demo.v $
-// /___/   /\     Timestamp: $DateTime: 2013/09/30 13:31:35 $
-// \   \  /  \
-//  \___\/\___\
-//
-// Description:
-//  This module is the top level HDL file for the Dual SDI demo for the AC701
-//  evaluation board.
-//
-// This version adds some delay before asserting the rx_refclk_stable and
-// tx_refclk_stable signals so that the GTP starts reliably after FPGA 
-// configuration.
-//
-//------------------------------------------------------------------------------
-//
-// DISCLAIMER
-// This disclaimer is not a license and does not grant any
-// rights to the materials distributed herewith. Except as
-// otherwise provided in a valid license issued to you by
-// Xilinx, and to the maximum extent permitted by applicable
-// law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-// WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
-// AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
-// BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
-// INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-// (2) Xilinx shall not be liable (whether in contract or tort,
-// including negligence, or under any other theory of
-// liability) for any loss or damage of any kind or nature
-// related to, arising under or in connection with these
-// materials, including for any direct, or any indirect,
-// special, incidental, or consequential loss or damage
-// (including loss of data, profits, goodwill, or any type of
-// loss or damage suffered as a result of any action brought
-// by a third party) even if such damage or loss was
-// reasonably foreseeable or Xilinx had been advised of the
-// possibility of the same.
-//
-// CRITICAL APPLICATIONS
-// Xilinx products are not designed or intended to be fail-
-// safe, or for use in any application requiring fail-safe
-// performance, such as life-support or safety devices or
-// systems, Class III medical devices, nuclear facilities,
-// applications related to the deployment of airbags, or any
-// other applications that could lead to death, personal
-// injury, or severe property or environmental damage
-// (individually and collectively, "Critical
-// Applications"). Customer assumes the sole risk and
-// liability of any use of Xilinx products in Critical
-// Applications, subject only to applicable laws and
-// regulations governing limitations on product liability.
-//
-// THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
-// PART OF THIS FILE AT ALL TIMES.
-//------------------------------------------------------------------------------
 
 `timescale 1ns / 1ps
 
@@ -143,12 +77,6 @@ module ac701_sdi_demo (
 //------------------------------------------------------------------------------
 // Internal signals definitions
 
-//
-// Set this parameter to "TRUE" to use ChipScope to control and monitor the demo.
-// Set this parameter to "FALSE" to use Vivado Analyzer to control and monitor
-// the demo.
-//
-parameter USE_CHIPSCOPE = "TRUE";
 
 // Global signals
 wire        clk_27M_in;
@@ -198,15 +126,6 @@ reg  [24:0] refclk_stable_dly = 1;
 wire        refclk_stable_tc;
 reg         refclk_stable = 1'b0;
 
-
-// ChipScope signals
-wire [35:0] control0;
-wire [35:0] control1;
-wire [35:0] control2;
-wire [35:0] control3;
-wire [35:0] control4;
-wire [35:0] control5;
-wire [35:0] control6;
 
 
 //------------------------------------------------------------------------------
@@ -315,9 +234,7 @@ always @ (posedge clk_27M)
 // drive the SDI transmitter, and ChipScope or Vivado Analyzer modules to 
 // control and monitor the SDI interface.
 //
-a7_sdi_rxtx #(
-    .USE_CHIPSCOPE      (USE_CHIPSCOPE))
-SDI0 (
+a7_sdi_rxtx SDI0 (
     .clk                (clk_27M),
     .tx_outclk          (tx0_outclk),
     .tx_usrclk          (tx0_usrclk),
@@ -351,41 +268,6 @@ SDI0 (
     .control1           (control2),
     .control2           (control3));
 
-a7_sdi_rxtx #(
-    .USE_CHIPSCOPE      (USE_CHIPSCOPE))
-SDI1 (
-    .clk                (clk_27M),
-    .tx_outclk          (tx1_outclk),
-    .tx_usrclk          (tx1_usrclk),
-    .tx_refclk_stable   (refclk_stable),
-    .tx_plllock         (pll0lock & pll1lock),
-    .tx_pllreset        (),
-    .tx_slew            (tx1_slew),
-    .tx_txen            (),
-    .rx_refclk_stable   (refclk_stable),
-    .rx_plllock         (pll0lock),             // RX only uses PLL0
-    .rx_pllreset        (),
-    .rx_outclk          (rx1_outclk),
-    .rx_usrclk          (rx1_usrclk),
-    .rx_locked          (rx1_locked),
-    .rx_t_family        (rx1_t_family),
-    .rx_t_rate          (rx1_t_rate),
-    .rx_t_scan          (rx1_t_scan),
-    .rx_level_b         (rx1_level_b),
-    .rx_m               (rx1_m),
-    .rx_mode            (rx1_mode),
-    .drpclk             (clk_27M),
-    .txp                (FMC1_HPC_DP1_C2M_P),
-    .txn                (FMC1_HPC_DP1_C2M_N),
-    .rxp                (FMC1_HPC_DP1_M2C_P),
-    .rxn                (FMC1_HPC_DP1_M2C_N),
-    .pll0clk            (pll0clk),
-    .pll0refclk         (pll0refclk),
-    .pll1clk            (pll1clk),
-    .pll1refclk         (pll1refclk),
-    .control0           (control4),
-    .control1           (control5),
-    .control2           (control6));
 
 //------------------------------------------------------------------------------
 // GTP COMMON wrapper
@@ -434,129 +316,6 @@ assign FMC1_HPC_LA18_CC_N = 1'b0;
 assign FMC1_HPC_LA10_N = 1'b0;
 assign FMC1_HPC_LA06_N = 1'b0;
 
-//------------------------------------------------------------------------------
-// Control module for LCD display on AC701 board
-//
-lcd_control5 #(
-    .ROM_FILE_NAME          ("a7_sdi_demo_name.txt"),
-    .MIN_FMC_FPGA_REVISION  (8'd0),
-    .REQUIRED_CML_TYPE      (16'h0000), // None
-    .REQUIRED_CMH_TYPE      (16'h0000)) // None
-LCD (
-    .clk                (clk_27M),
-    .rst                (1'b0),
-    .sw_c               (GPIO_SW_C),
-    .sw_w               (GPIO_SW_W),
-    .sw_e               (GPIO_SW_E),
-    .sw_n               (GPIO_SW_N),
-    .sw_s               (GPIO_SW_S),
-    .fpga_rev           (8'd0),
-    .cml_type           (16'h0000),
-    .cml_type_valid     (1'b0),
-    .cml_type_error     (1'b0),
-    .cmh_type           (16'h0000),
-    .cmh_type_valid     (1'b0),
-    .cmh_type_error     (1'b0),
-    .active_rx          (4'b0011),
-    .rx0_locked         (rx0_locked),
-    .rx0_mode           (rx0_mode),
-    .rx0_level          (rx0_level_b),
-    .rx0_t_family       (rx0_t_family),
-    .rx0_t_rate         (rx0_t_rate),
-    .rx0_t_scan         (rx0_t_scan),
-    .rx0_m              (rx0_m),
-    .rx1_locked         (rx1_locked),
-    .rx1_mode           (rx1_mode),
-    .rx1_level          (rx1_level_b),
-    .rx1_t_family       (rx1_t_family),
-    .rx1_t_rate         (rx1_t_rate),
-    .rx1_t_scan         (rx1_t_scan),
-    .rx1_m              (rx1_m),
-    .rx2_locked         (1'b0),
-    .rx2_mode           (2'b00),
-    .rx2_level          (1'b0),
-    .rx2_t_family       (4'b0000),
-    .rx2_t_rate         (4'b0000),
-    .rx2_t_scan         (1'b0),
-    .rx2_m              (1'b0),
-    .rx3_locked         (1'b0),
-    .rx3_mode           (2'b00),
-    .rx3_level          (1'b0),
-    .rx3_t_family       (4'b0000),
-    .rx3_t_rate         (4'b0000),
-    .rx3_t_scan         (1'b0),
-    .rx3_m              (1'b0),
-    .sync_active        (1'b0),
-    .sync_enable        (1'b0),
-    .sync_v             (1'b0),
-    .sync_err           (1'b0),
-    .sync_m             (1'b0),
-    .sync_frame_rate    (3'b0),
-    .sync_video_fmt     (11'b0),
-    .lcd_e              (LCD_E_LS),
-    .lcd_rw             (LCD_RW_LS),
-    .lcd_rs             (LCD_RS_LS),
-    .lcd_d              (lcd_d));
-
-assign LCD_DB4_LS = lcd_d[0];
-assign LCD_DB5_LS = lcd_d[1];
-assign LCD_DB6_LS = lcd_d[2];
-assign LCD_DB7_LS = lcd_d[3];
-
-//------------------------------------------------------------------------------
-// This module controls the LMH0387 bidirectional SDI PHY devices on the SDI
-// FMC mezzanine board with I2C bus.
-//
-LMH0387_control LMH0387ctrl (
-    .clk        (clk_27M),
-    .rst        (1'b0),
-    .sclk       (FMC1_HPC_LA17_CC_P),
-    .mosi       (FMC1_HPC_LA13_P),
-    .miso       (FMC1_HPC_LA13_N),
-    .ss0t       (FMC1_HPC_LA01_CC_P),
-    .ss0r       (FMC1_HPC_LA01_CC_N),
-    .ss1t       (FMC1_HPC_LA05_P),
-    .ss1r       (FMC1_HPC_LA05_N),
-    .ss2        (FMC1_HPC_LA09_P),
-    .ss3        (FMC1_HPC_LA09_N),
-    .rxeq_en    (4'b0011));         // Enable EQ on RX1 and RX2
-
-//------------------------------------------------------------------------------
-// ChipScope or Vivado analyzer modules
-//
-generate 
-if (USE_CHIPSCOPE == "TRUE")
-begin : chipscope
-    icon icon (
-        .CONTROL0   (control0),
-        .CONTROL1   (control1),
-        .CONTROL2   (control2),
-        .CONTROL3   (control3),
-        .CONTROL4   (control4),
-        .CONTROL5   (control5),
-        .CONTROL6   (control6));
-
-    vio vio (
-        .CONTROL    (control0),
-        .ASYNC_IN   ({4'b0000, pll1reset, pll0reset, pll1lock, pll0lock}));
-
-end else
-begin : vivado_analyzer
-    vio0 vio0 (
-        .clk        (clk_27M),
-        .probe_in3  (pll1reset),        // 1 bit
-        .probe_in4  (pll0reset),        // 1 bit
-        .probe_in5  (pll1lock),         // 1 bit
-        .probe_in6  (pll0lock));        // 1 bit
-
-    assign control1 = 35'b0;
-    assign control2 = 35'b0;
-    assign control3 = 35'b0;
-    assign control4 = 35'b0;
-    assign control5 = 35'b0;
-    assign control6 = 35'b0;
-end
-endgenerate
 
 endmodule
 
