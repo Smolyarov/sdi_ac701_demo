@@ -1,0 +1,10 @@
+*
+!/*/
+!/*/*/
+!*.xise
+!*.vhd
+!*.v
+!*.ucf
+!*.cdc
+!*.xco
+!.gitignore
